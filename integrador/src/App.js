@@ -9,7 +9,7 @@ import Lista from './Lista';
 function App() {
   return (
     <div>
-      <Lista />
+      {/* <Lista /> */}
       <TelaLogin />
       <TelaAdm />
       <TelaGravador />
