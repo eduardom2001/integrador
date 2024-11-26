@@ -1,4 +1,5 @@
 ALUNOS:
+
         Arthur Emanuel da Silva (2211100029) - Banco de Dados I, Engenharia de Software I, Programação II
         Eduardo Folle Miotto (1911100015) - Programação II
 
