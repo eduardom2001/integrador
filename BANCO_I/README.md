@@ -4,7 +4,7 @@ Como é um projeto relativamente grande, fiz algumas simplificações em relaç�
 
 2) As Vinhetas e as Músicas foram agregadas em uma Entidade-Mãe com nome Material de Áudio;
 
-3) Da mesma forma, Gênero Músical e Tipo de Vinheta foram unidos em Gênero/Tipo, pois ambas entidades teriam mesmos= funcionamento e mesmos atributos.
+3) Da mesma forma, Gênero Músical e Tipo de Vinheta foram unidos em Gênero/Tipo, pois ambas entidades teriam mesmos funcionamento e mesmos atributos.
 
 ->Arthur Emanuel da Silva (2211100029)
                                                                                                                 
