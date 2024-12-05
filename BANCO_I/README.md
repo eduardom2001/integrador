@@ -1,6 +1,6 @@
 ========================================LÓGICO===============================================
 
-1)Notei uma redundância no meu modelo conceitual, eu estava armazenando nome, duração e endereço do arquivo de áudio em MODELO DE ROTEIRO, 
+1) Notei uma redundância no meu modelo conceitual, eu estava armazenando nome, duração e endereço do arquivo de áudio em MODELO DE ROTEIRO, 
 mas isso não é necessário pois eu estou armazenando em cada tipo de material já, posso obter todos esses dados por JOIN
 
 2) Armazenei a duração das músicas como int que serão armazenadas em segundos
