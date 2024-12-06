@@ -10,8 +10,8 @@ function App() {
   return (
     <div>
       {/* <Lista /> */}
-      {/* <TelaLogin /> */}
-      <TelaAdm />
+      <TelaLogin />
+      {/* <TelaAdm /> */}
       <TelaGravador />
       <TelaOperador />
     </div>

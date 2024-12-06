@@ -20,8 +20,9 @@ function TelaAdm() {
                     <p>escolha arquivo de audio</p>
                 </Container>
                 <Button>cadastrar</Button>
-                <Box sx={{ bgcolor: '#cfe8fc', height: '10vh' }} />
+                
             </Container>
+            
         </div>
     );
 }
