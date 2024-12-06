@@ -1,6 +1,9 @@
+
+
 function TelaGravador() {
     return (
         <div>
+            
             
         </div>
     );
