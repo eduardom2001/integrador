@@ -1,15 +1,7 @@
-import { Grid2, Container, Paper, TextField, OutlinedInput, Button } from "@mui/material";
+import { Box, IconButton, InputLabel, FormControl, InputAdornment, Container, Paper, OutlinedInput, Button } from "@mui/material";
 
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Input from '@mui/material/Input';
-import FilledInput from '@mui/material/FilledInput';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
-//import TextField from '@mui/material/TextField';
+
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -30,9 +22,9 @@ function TelaLogin() {
     }
 
     return (
-        <div>
+        <div style={{ height: '80vh', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', paddingRight: '33%' }}>
 
-            <Container maxWidth="xs">
+            <Container sx={{ width: 400 }}>
                 <Paper elevation={10} sx={{marginTop: 8, padding: 2 }}>
                     <Box display="flex" justifyContent="center" alignItems="center">
                         <h2>Login</h2>
@@ -42,7 +34,7 @@ function TelaLogin() {
                     <Box display="flex" flexDirection="column" alignItems="center">
 
                         {/* USUARIO */}
-                        <FormControl sx={{ m: 1 }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: '85%' }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Usuário</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-usuario"
@@ -52,11 +44,11 @@ function TelaLogin() {
                         
 
                         {/* SENHA */}
-                        <FormControl sx={{ m: 1 }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: '85%' }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Senha</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
-                                type={showPassword ? 'text' : 'Senha'}
+                                type={showPassword ? 'text' : 'password'}
                                 endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
