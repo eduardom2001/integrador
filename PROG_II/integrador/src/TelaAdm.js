@@ -1,118 +1,71 @@
 import * as React from 'react';
-import { Button, Container, Box, Autocomplete, TextField, FormControl, InputLabel, OutlinedInput, Typography, Paper } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useDropzone } from 'react-dropzone';
+import { Box, Typography, AppBar, Toolbar, IconButton, Menu, MenuItem } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import TelaAdmCadastro from './TelaAdmCadastro';
+import TelaAdmBloco from './TelaAdmBloco';
 
 function TelaAdm() {
 
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: '.mp3,.wav', // Accept audio files
-        onDrop: (acceptedFiles) => {
-          // Handle file selection
-          console.log(acceptedFiles);
+    // State to manage the menu anchor
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const openMenu = Boolean(anchorEl);
+
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const [currentScreen, setCurrentScreen] = React.useState('telaUm');
+
+    const handleOptionClick = (option) => {
+        if (option === 'First Screen') {
+            setCurrentScreen('telaUm');
+
         }
-            });
+        else if (option === 'Second Screen') {
+            setCurrentScreen('telaDois');
+        }
+        else if (option === 'Logout') {
+            console.log('logging out');
+        }
+        console.log(`Selected: ${option}`);
+        handleMenuClose(); // Close the menu after selecting an option
+    };
 
     return (
-        <div>
-            <Container maxWidth="md" sx={{ border: 1, borderColor: 'primary.main'}}>
-                
-                <Box display="flex" justifyContent="center" alignItems="center">
-                    <h1>Cadastro comercial</h1>
-                </Box>
+        <div style={{ marginTop: 0, paddingTop: 0 }}>
+            
+            {/* HEADER */}
+            <AppBar position="absolute" sx={{ top: 0, left: 0, right: 0 }}>
+                <Toolbar>
 
-                <Container sx={{ border: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
-                    <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <p style={{ marginRight: '8px', fontSize: '20px' }}>Cliente:</p>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, position: 'absolute', left: '10%' }}>
+                        <img src="path_to_your_logo.png" alt="Logo" style={{ width: 40, height: 40, marginRight: '10px' }} />
+                        <Typography variant="h6">Rádio Condá</Typography>
                     </Box>
-                    <Box sx={{ flexBasis: '66.66%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Autocomplete
-                            disablePortal
-                            //options={top100Films}
-                            sx={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label="Cliente" />}
-                            />
-                    </Box>
-                </Container>
 
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
                     
-                    <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <p style={{ marginRight: '8px', fontSize: '20px' }}>Nome do Comercial:</p>
-                    </Box>
-                    
-                    <Box sx={{ flexBasis: '66.66%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <FormControl sx={{ width: '56%' }} variant="outlined">
-                            <InputLabel htmlFor="outlined-adornment-password">Comercial</InputLabel>
-                            <OutlinedInput
-                                id="outlined-adornment-usuario"
-                                label="Comercial"
-                                />
-                        </FormControl>
-                    </Box>
-                    
-                </Container>
+                    <IconButton edge="end" color="inherit" onClick={handleMenuClick} sx={{ position: 'absolute', right: '10%' }}>
+                        <MoreVertIcon />
+                    </IconButton>
 
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
+                    <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+                        <MenuItem onClick={() => handleOptionClick('First Screen')}>Cadastro Comercial</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('Second Screen')}>Bloco Comercial</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('Logout')}>Logout</MenuItem>
+                    </Menu>
+                </Toolbar>
+            </AppBar>
+            
 
-                    <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <p style={{ marginRight: '8px', fontSize: '20px' }}>Data de Cadastro:</p>
-                    </Box>
+            {/* CADASTRO COMERCIAIS */}
+            {currentScreen === 'telaUm' && <TelaAdmCadastro />}
 
-                    <Box sx={{ flexBasis: '66.66%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker sx={{ width: '56%' }}/>
-                        </LocalizationProvider>
-                    </Box>
-
-                </Container>
-
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
-
-                    <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <p style={{ marginRight: '8px', fontSize: '20px' }}>Data de Vencimento:</p>
-                    </Box>
-
-                    <Box sx={{ flexBasis: '66.66%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker sx={{ width: '56%' }}/>
-                        </LocalizationProvider>
-                    </Box>
-
-                </Container>
-                
-
-                <Container sx={{ border: 1, borderColor: 'primary.main', padding: 2 }}>
-                    <Paper 
-                        {...getRootProps()} 
-                        sx={{
-                        borderWidth: 3,  
-                        borderStyle: 'dotted',
-                        borderColor: 'primary.main', 
-                        padding: 2, 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        minHeight: '150px', 
-                        cursor: 'pointer', 
-                        backgroundColor: '#f5f5f5'
-                        }}
-                    >
-                        <input {...getInputProps()} />
-                        <Typography variant="body2" sx={{ textAlign: 'center' }}>
-                        Arraste e solte o arquivo de áudio aqui ou clique para selecionar
-                        </Typography>
-                    </Paper>
-                </Container>
-
-                <Box display="flex" justifyContent="center" alignItems="center"  sx={{paddingTop: '16px', paddingBottom: '16px'}}>
-                    <Button variant="contained">cadastrar</Button>
-                </Box>
-                
-            </Container>
+            {currentScreen === 'telaDois' && <TelaAdmBloco />}
             
         </div>
     );
