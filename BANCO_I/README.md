@@ -1,3 +1,10 @@
+========================================FÍSICO===============================================
+
+1)Fiz algumas alterações no modelo, o único jeito que consegui implementar a adição de diferentes materiais em uma playlist foi fazer uma relação indireta, em items_playlist eu tenho o atributo cod_material, que faz uma referência indireta com as tabelas de música, vinheta ou comerciais, a identificação de qual tipo é feita pelo atributo tipo, o controle de qual chave apontará (cod_musica, cod_vinheta ou cod_comercial) será feito a nível de aplicação, com base no atributo tipo.
+
+2)Mudei o Bloco Comercial para funcionar mais como um "Gênero de Comerciais", porque acredito que fique mais intuitivo.
+
+
 ========================================LÓGICO===============================================
 
 1) Notei uma redundância no meu modelo conceitual, eu estava armazenando nome, duração e endereço do arquivo de áudio em MODELO DE ROTEIRO, 
