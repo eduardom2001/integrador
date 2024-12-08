@@ -1,19 +1,35 @@
 import * as React from 'react';
-import { Button, Container, Box, Autocomplete, TextField, FormControl, InputLabel, OutlinedInput, Typography, Paper } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useDropzone } from 'react-dropzone';
+import { Container, Box, TextField, List, ListItem, ListItemText } from '@mui/material';
+import axios from 'axios';
 
 function TelaAdmBloco() {
 
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: '.mp3,.wav', // Accept audio files
-        onDrop: (acceptedFiles) => {
-          // Handle file selection
-          console.log(acceptedFiles);
-        }
-    });
+
+    const [data, setData] = React.useState([]); // State for storing data from the API
+    const [searchQuery, setSearchQuery] = React.useState(''); // State for managing search query
+    const [filteredData, setFilteredData] = React.useState([]); // State for filtered data
+
+    React.useEffect(() => {
+        // Fetch data from your database (replace with your API endpoint)
+        axios.get('https://api.example.com/data') // Replace with your actual API endpoint
+        .then(response => {
+            setData(response.data); // Store the response data in state
+            setFilteredData(response.data); // Initialize filtered data
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }, []);
+
+    // Handle search input changes
+    const handleSearch = (event) => {
+        const query = event.target.value.toLowerCase();
+        setSearchQuery(query);
+
+        // Filter data based on the search query
+        const filtered = data.filter(item => 
+        item.name.toLowerCase().includes(query) // Adjust this based on your data structure
+        );
+        setFilteredData(filtered); // Update filtered data
+    };
 
     return (
         <div>
@@ -28,6 +44,34 @@ function TelaAdmBloco() {
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Busque o Comercial que deseja inserir no roteiro:</p>
                     </Box>
                     
+                    <Container sx={{ padding: '20px' }}>
+                        {/* Search Bar using MUI TextField */}
+                        <Box sx={{ marginBottom: '20px' }}>
+                            <TextField
+                            label="Search"
+                            variant="outlined"
+                            fullWidth
+                            //value={searchQuery}
+                            //onChange={handleSearch}
+                            />
+                        </Box>
+
+                        {/* List of Data */}
+                        <List>
+                            {filteredData.length > 0 ? (
+                            filteredData.map(item => (
+                                <ListItem key={item.id}>
+                                <ListItemText primary={item.name} /> {/* Change 'name' to your data field */}
+                                </ListItem>
+                            ))
+                            ) : (
+                            <ListItem>
+                                <ListItemText primary="No results found" />
+                            </ListItem>
+                            )}
+                        </List>
+                    </Container>
+
                 </Container>
                 
             </Container>
