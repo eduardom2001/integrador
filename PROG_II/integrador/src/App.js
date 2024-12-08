@@ -17,7 +17,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState(null);
 
-  const navigate = React.useNavigate();
+  
 
 	useEffect(() => {
 		// verifica se já está logado
