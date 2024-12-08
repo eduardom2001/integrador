@@ -1,25 +1,27 @@
+
 CREATE TABLE IF NOT EXISTS login(
-    username varchar(20) NOT NULL,
-    "password" varchar(20) NOT NULL,
+    username varchar(255) NOT NULL,
+    "password" varchar(255) NOT NULL,
     constraint pk_login primary key (username)
     
 );
 
 CREATE TABLE IF NOT EXISTS clientes(
     cnpj varchar(14) NOT NULL,
-    nome varchar(20) NOT NULL,
+    nome varchar(255) NOT NULL,
     telef varchar(11) NOT NULL,
-    email varchar(50) NOT NULL,
-    rua varchar(50) NOT NULL,
+    email varchar(255) NOT NULL,
+    rua varchar(255) NOT NULL,
     num varchar(10) NOT NULL,
-    bairro varchar(50) NOT NULL,
-    cidade varchar(30) NOT NULL,
+    bairro varchar(255) NOT NULL,
+    cidade varchar(255) NOT NULL,
     uf varchar(2) NOT NULL,
     constraint pk_clientes primary key (cnpj)
 );
 
 CREATE TABLE IF NOT EXISTS comerciais(
     cod SERIAL NOT NULL,
+    nome varchar(255) NULL,
     cnpj_cliente varchar(14) NOT NULL,
     file_path varchar(255) NOT NULL,
     dur int NOT NULL,
@@ -27,13 +29,6 @@ CREATE TABLE IF NOT EXISTS comerciais(
     dt_venc date NOT NULL,
     constraint pk_comerciais primary key (cod),
     constraint fk_clientes_comerciais foreign key (cnpj_cliente) references clientes(cnpj)
-);
-
-CREATE TABLE IF NOT EXISTS blocos(
-    horario TIME NOT NULL,
-    cod_com int NOT NULL,
-    constraint pk_blocos primary key (horario,cod_com),
-    constraint fk_blocos_comerciais foreign key (cod_com) references comerciais(cod)
 );
 
 CREATE TABLE IF NOT EXISTS generos(
@@ -67,6 +62,6 @@ CREATE TABLE IF NOT EXISTS items_playlist(
     id SERIAL NOT NULL,
     posicao int NOT NULL,
     cod_material int NOT NULL,
-    tipo varchar(50) NOT NULL,
+    tipo varchar(255) NOT NULL,
     constraint pk_items_playlist primary key (id)
 );
