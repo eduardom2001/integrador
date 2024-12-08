@@ -11,8 +11,8 @@ function App() {
     <div>
       {/* <Lista /> */}
       {/* <TelaLogin /> */}
-      <TelaAdm />
-      <TelaGravador />
+      {/* <TelaAdm /> */}
+      {/* <TelaGravador /> */}
       <TelaOperador />
     </div>
   );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, Box, TextField, List, ListItem, ListItemText } from '@mui/material';
+import { Container, Box, TextField, List, ListItem, ListItemText, Button } from '@mui/material';
 import axios from 'axios';
 
 function TelaAdmBloco() {
@@ -33,13 +33,13 @@ function TelaAdmBloco() {
 
     return (
         <div>
-            <Container maxWidth="md" sx={{ border: 1, borderColor: 'primary.main', marginTop: '100px'}}>
+            <Container maxWidth="md" sx={{ border: 1, marginTop: '100px'}}>
                 
                 <Box display="flex" justifyContent="center" alignItems="center">
                     <h1>Inserir Comercial em Bloco Comercial</h1>
                 </Box>
 
-                <Container sx={{ border: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
+                <Container sx={{ border: 1, borderBottom: 0, display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Busque o Comercial que deseja inserir no roteiro:</p>
                     </Box>
@@ -72,6 +72,17 @@ function TelaAdmBloco() {
                         </List>
                     </Container>
 
+
+
+                </Container>
+
+                <Container sx={{border: 1, borderTop: 0, marginBottom: '25px', justifyContent: 'center', alignContent: 'center', display: 'flex'}}>
+                    <List>
+
+                    </List>
+                    <Box display="flex" justifyContent="center" alignItems="center"  sx={{paddingTop: '16px', paddingBottom: '16px'}}>
+                        <Button variant="contained" sx={{backgroundColor: 'black'}}>confirmar mudanças</Button>
+                    </Box>
                 </Container>
                 
             </Container>

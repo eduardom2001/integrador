@@ -40,12 +40,12 @@ function TelaAdm() {
         <div style={{ marginTop: 0, paddingTop: 0 }}>
             
             {/* HEADER */}
-            <AppBar position="absolute" sx={{ top: 0, left: 0, right: 0 }}>
+            <AppBar position="absolute" sx={{ top: 0, left: 0, right: 0, backgroundColor: 'black'}}>
                 <Toolbar>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, position: 'absolute', left: '10%' }}>
                         <img src="path_to_your_logo.png" alt="Logo" style={{ width: 40, height: 40, marginRight: '10px' }} />
-                        <Typography variant="h6">Rádio Condá</Typography>
+                        <Typography variant="h6">Rádio Condá - Administração</Typography>
                     </Box>
 
                     

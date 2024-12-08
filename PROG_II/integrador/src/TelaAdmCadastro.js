@@ -17,13 +17,13 @@ function TelaAdmCadastro() {
 
     return (
         <div>
-            <Container maxWidth="md" sx={{ border: 1, borderColor: 'primary.main', marginTop: '100px'}}>
+            <Container maxWidth="md" sx={{ border: 1, marginTop: '100px'}}>
                 
                 <Box display="flex" justifyContent="center" alignItems="center">
                     <h1>Cadastro comercial</h1>
                 </Box>
 
-                <Container sx={{ border: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
+                <Container sx={{ border: 1, display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
                     <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Cliente:</p>
                     </Box>
@@ -37,7 +37,7 @@ function TelaAdmCadastro() {
                     </Box>
                 </Container>
 
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
+                <Container sx={{ borderRight: 1, borderLeft: 1, display: 'flex', justifyContent: 'space-between', paddingTop: '16px', paddingBottom: '16px'}}>
                     
                     <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Nome do Comercial:</p>
@@ -55,7 +55,7 @@ function TelaAdmCadastro() {
                     
                 </Container>
 
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
+                <Container sx={{ borderRight: 1, borderLeft: 1, display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
 
                     <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Data de Cadastro:</p>
@@ -69,7 +69,7 @@ function TelaAdmCadastro() {
 
                 </Container>
 
-                <Container sx={{ borderRight: 1, borderLeft: 1, borderColor: 'primary.main', display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
+                <Container sx={{ borderRight: 1, borderLeft: 1, display: 'flex', justifyContent: 'space-between', paddingBottom: '16px'}}>
 
                     <Box sx={{ flexBasis: '33.33%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <p style={{ marginRight: '8px', fontSize: '20px' }}>Data de Vencimento:</p>
@@ -84,13 +84,12 @@ function TelaAdmCadastro() {
                 </Container>
                 
 
-                <Container sx={{ border: 1, borderColor: 'primary.main', padding: 2 }}>
+                <Container sx={{ border: 1, padding: 2 }}>
                     <Paper 
                         {...getRootProps()} 
                         sx={{
                         borderWidth: 3,  
                         borderStyle: 'dotted',
-                        borderColor: 'primary.main', 
                         padding: 2, 
                         display: 'flex', 
                         justifyContent: 'center', 
@@ -108,7 +107,7 @@ function TelaAdmCadastro() {
                 </Container>
 
                 <Box display="flex" justifyContent="center" alignItems="center"  sx={{paddingTop: '16px', paddingBottom: '16px'}}>
-                    <Button variant="contained">cadastrar</Button>
+                    <Button variant="contained" sx={{backgroundColor: 'black'}}>cadastrar</Button>
                 </Box>
                 
             </Container>
