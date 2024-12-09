@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Container, Button, Box, Typography, AppBar, Toolbar, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-function TelaGravador() {
+function TelaGravador(props) {
 
     // State to manage the menu anchor
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -21,6 +21,7 @@ function TelaGravador() {
     const handleOptionClick = (option) => {
         if (option === 'Logout') {
             console.log('logging out');
+            props.logout();
         }
         console.log(`Selected: ${option}`);
         handleMenuClose(); // Close the menu after selecting an option

@@ -31,16 +31,21 @@ function TelaLogin(props) {
 		event.preventDefault();
 		try {
 			console.log(props.user);
-			const response = await axios.post("/login", {
+			const response = await axios.post("http://localhost:3001/login", {
 				username: username,
 				password: passwd,
 			});
 			if (response.status >= 200 && response.status < 300) {
+                console.log('aaaaaaaaaaaaa');
+                //props.user = username;
 				// Salva o token JWT na sessão
 				localStorage.setItem("token", response.data.token);
+                localStorage.setItem("username", username);
 				// seta o estado do login caso tudo deu certo
 				props.handleLogin(true);
 				console.log(props.user);
+
+                window.location.reload();
 			} else {
 				// falha
 				console.error("Falha na autenticação");
@@ -85,6 +90,8 @@ function TelaLogin(props) {
                             <OutlinedInput
                                 id="outlined-adornment-usuario"
                                 label="Usuario"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 />
                         </FormControl>
                         
@@ -95,6 +102,8 @@ function TelaLogin(props) {
                             <OutlinedInput
                                 id="outlined-adornment-password"
                                 type={showPassword ? 'text' : 'password'}
+                                value={passwd}
+                                onChange={(e) => setPasswd(e.target.value)}
                                 endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton

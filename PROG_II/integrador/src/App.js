@@ -22,7 +22,9 @@ function App() {
 	useEffect(() => {
 		// verifica se já está logado
 		const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role");
+    const userRole = localStorage.getItem("username");
+    console.log('teste: ',userRole);
+    console.log('token: ', token);
 		if (token) {
 			setIsLoggedIn(true);
       setCurrentUser(userRole);
@@ -37,7 +39,7 @@ function App() {
   const handleLogout = () => {
     // Clear the token from localStorage
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    localStorage.removeItem("username");
     setIsLoggedIn(false);
     setCurrentUser(null);
   };
@@ -51,10 +53,18 @@ function App() {
       {/* <TelaOperador /> */}
 
       {isLoggedIn ? (
-        (currentUser === 'adm' && <TelaAdm />)
-        (currentUser === 'gravador' && <TelaGravador />)
-        (currentUser === 'operador' && <TelaOperador />)
-			) : (<TelaLogin user={isLoggedIn} handleLogin={setIsLoggedIn} />)}
+        currentUser === "comercial" ? (
+          <TelaAdm logout={handleLogout}/>
+        ) : currentUser === "gravadora" ? (
+          <TelaGravador logout={handleLogout}/>
+        ) : currentUser === "operador" ? (
+          <TelaOperador logout={handleLogout}/>
+        ) : (
+          <TelaLogin user={isLoggedIn} handleLogin={setIsLoggedIn} />
+        )
+      ) : (
+        <TelaLogin user={isLoggedIn} handleLogin={setIsLoggedIn} />
+      )}
 
     </div>
   );

@@ -5,7 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TelaAdmCadastro from './TelaAdmCadastro';
 import TelaAdmBloco from './TelaAdmBloco';
 
-function TelaAdm() {
+function TelaAdm(props) {
 
     // State to manage the menu anchor
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -31,6 +31,9 @@ function TelaAdm() {
         }
         else if (option === 'Logout') {
             console.log('logging out');
+            props.logout();
+
+
         }
         console.log(`Selected: ${option}`);
         handleMenuClose(); // Close the menu after selecting an option

@@ -20,8 +20,7 @@ const PORT = 3001
 app.listen(PORT, ( ) => {
     console.log(`Servidor rodando no endereco http://localhost:${PORT}`);
 })
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 //========================================================================================================================================
 
@@ -73,6 +72,9 @@ app.use(
 		cookie: { secure: true },
 	}),
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 const saltRounds = 10;
 

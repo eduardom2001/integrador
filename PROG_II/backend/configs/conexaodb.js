@@ -3,7 +3,7 @@ const pgp = require("pg-promise")({}); // Importa a biblioteca pg-promise para i
 const {join} = require("node:path") //para trabalhar com caminhos de arquivos
 
 const usuario = "postgres"; 
-const senha = "postgres";
+const senha = "trybswtaw";
 
 
 //LEMBRE DE CRIAR UMA DATABASE radio_database e atualizar user e senha do seu usuario no postgres!!!!
