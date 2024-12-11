@@ -1,6 +1,7 @@
 ==========================================NOTAS FINAIS=======================================
 
 1)De modo a deixar o projeto menos complexo, atualizei o banco para ser mais simples de implementar, principalmente devido ao front e backend do aplicativo web;
+
 2)Deixei numa pasta separada as versões antigas, os Atualizados são os que eu efetivamente utilizei para a aplicação, os Atualizados foram feitos com base nas adaptações que fiz no scrip enquanto projetava o backend.
 
 
