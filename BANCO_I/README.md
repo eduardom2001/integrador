@@ -4,6 +4,8 @@
 
 2)Deixei numa pasta separada as versões antigas, os Atualizados são os que eu efetivamente utilizei para a aplicação, os Atualizados foram feitos com base nas adaptações que fiz no script-db.sql enquanto projetava o backend.
 
+3)Fiz uma adaptação no script-db.sql, creio que eu tenha "desnormalizado" meu banco, mas deixo isso para a apresentação.
+
 
 ->Arthur Emanuel da Silva (2211100029)
 
