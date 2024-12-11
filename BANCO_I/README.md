@@ -2,7 +2,7 @@
 
 1)De modo a deixar o projeto menos complexo, atualizei o banco para ser mais simples de implementar, principalmente devido ao front e backend do aplicativo web;
 
-2)Deixei numa pasta separada as versões antigas, os Atualizados são os que eu efetivamente utilizei para a aplicação, os Atualizados foram feitos com base nas adaptações que fiz no script.sql enquanto projetava o backend.
+2)Deixei numa pasta separada as versões antigas, os Atualizados são os que eu efetivamente utilizei para a aplicação, os Atualizados foram feitos com base nas adaptações que fiz no script-db.sql enquanto projetava o backend.
 
 
 ->Arthur Emanuel da Silva (2211100029)
