@@ -183,9 +183,13 @@ app.post('/comerciais',uploadComercial.single("audio"), async (req,res) => {
         const comercialDataCadastro = req.body.cadastro;
         const comercialDataVencimento = req.body.vencimento;
         const comercialFilePath = path.join(__dirname, "uploads/comerciais", req.file.filename);
+        
+        console.log("Data received:", {
+            comercialDataCadastro,
+            comercialDataVencimento,
+        });
+        
         const duration = await calculateAudioDuration(comercialFilePath);
-
-
         
         await db.none(
             "INSERT INTO comerciais (nome,cnpj_cliente,file_path,dur,dt_cad,dt_venc) VALUES ($1,$2,$3,$4,$5,$6) ",
@@ -194,9 +198,12 @@ app.post('/comerciais',uploadComercial.single("audio"), async (req,res) => {
     
         res.sendStatus(201);
     }  catch (error) {
-    console.error("Erro ao salvar música:", error);
-    res.status(500).json({ error: "Erro ao salvar música" });
-}
+        console.log('AQUI');
+        console.log(req.body);
+        console.log(req.file);
+        console.error("Erro ao salvar música:", error);
+        res.status(500).json({ error: "Erro ao salvar música" });
+    }
 })
 
 app.put('/comerciais/:cod', async (req,res) => {

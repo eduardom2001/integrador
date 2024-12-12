@@ -1,11 +1,8 @@
 import * as React from 'react';
 import axios from 'axios';
 
-import { Button, Container, Box, Autocomplete, TextField, FormControl, InputLabel, OutlinedInput, Typography, Paper, List, ListItem, ListItemText, Grid2, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useDropzone } from 'react-dropzone';
+import { Button, Container, Box, Autocomplete, TextField, Typography, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
+
 
 //import { useState } from 'react';
 
