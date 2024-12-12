@@ -4,6 +4,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import TelaAdmCadastro from './TelaAdmCadastro';
 import TelaAdmBloco from './TelaAdmBloco';
+import TelaAdmCliente from './TelaAdmCliente';
 
 function TelaAdm(props) {
 
@@ -28,6 +29,9 @@ function TelaAdm(props) {
         }
         else if (option === 'Second Screen') {
             setCurrentScreen('telaDois');
+        }
+        else if (option === 'Third Screen') {
+            setCurrentScreen('telaTres');
         }
         else if (option === 'Logout') {
             console.log('logging out');
@@ -57,8 +61,9 @@ function TelaAdm(props) {
                     </IconButton>
 
                     <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-                        <MenuItem onClick={() => handleOptionClick('First Screen')}>Cadastro Comercial</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('First Screen')}>Comercial</MenuItem>
                         <MenuItem onClick={() => handleOptionClick('Second Screen')}>Bloco Comercial</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('Third Screen')}>Clientes</MenuItem>
                         <MenuItem onClick={() => handleOptionClick('Logout')}>Logout</MenuItem>
                     </Menu>
                 </Toolbar>
@@ -69,6 +74,8 @@ function TelaAdm(props) {
             {currentScreen === 'telaUm' && <TelaAdmCadastro />}
 
             {currentScreen === 'telaDois' && <TelaAdmBloco />}
+
+            {currentScreen === 'telaTres' && <TelaAdmCliente />}
             
         </div>
     );
