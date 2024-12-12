@@ -229,7 +229,7 @@ app.delete('/comerciais/:cod', async (req,res) => {
                 console.log("Arquivo deletado com sucesso");
             }
         });;
-        await db.none("DELETE FROM musicas WHERE cod = $1", comercialCod);
+        await db.none("DELETE FROM comerciais WHERE cod = $1", comercialCod);
         res.sendStatus(200);
     }catch (error){
         console.log(error)
