@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Typography, AppBar, Toolbar, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-import TelaAdmCadastro from './TelaAdmCadastro';
+import TelaAdmComercial from './TelaAdmComercial';
 import TelaAdmBloco from './TelaAdmBloco';
 import TelaAdmCliente from './TelaAdmCliente';
 
@@ -62,16 +62,16 @@ function TelaAdm(props) {
 
                     <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
                         <MenuItem onClick={() => handleOptionClick('First Screen')}>Comercial</MenuItem>
-                        <MenuItem onClick={() => handleOptionClick('Second Screen')}>Bloco Comercial</MenuItem>
                         <MenuItem onClick={() => handleOptionClick('Third Screen')}>Clientes</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('Second Screen')}>Bloco Comercial</MenuItem>
                         <MenuItem onClick={() => handleOptionClick('Logout')}>Logout</MenuItem>
-                    </Menu>
+                    </Menu> 
                 </Toolbar>
             </AppBar>
             
 
             {/* CADASTRO COMERCIAIS */}
-            {currentScreen === 'telaUm' && <TelaAdmCadastro />}
+            {currentScreen === 'telaUm' && <TelaAdmComercial />}
 
             {currentScreen === 'telaDois' && <TelaAdmBloco />}
 
