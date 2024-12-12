@@ -1,9 +1,21 @@
+==========================================NOTAS FINAIS=======================================
+
+1)De modo a deixar o projeto menos complexo, atualizei o banco para ser mais simples de implementar, principalmente devido ao front e backend do aplicativo web;
+
+2)Deixei numa pasta separada as versões antigas, os Atualizados são os que eu efetivamente utilizei para a aplicação, os Atualizados foram feitos com base nas adaptações que fiz no script-db.sql enquanto projetava o backend.
+
+3)Fiz uma adaptação no script-db.sql, creio que eu tenha "desnormalizado" meu banco, mas deixo isso para a apresentação.
+
+
+->Arthur Emanuel da Silva (2211100029)
+
 ========================================FÍSICO===============================================
 
 1)Fiz algumas alterações no modelo, o único jeito que consegui implementar a adição de diferentes materiais em uma playlist foi fazer uma relação indireta, em items_playlist eu tenho o atributo cod_material, que faz uma referência indireta com as tabelas de música, vinheta ou comerciais, a identificação de qual tipo é feita pelo atributo tipo, o controle de qual chave apontará (cod_musica, cod_vinheta ou cod_comercial) será feito a nível de aplicação, com base no atributo tipo.
 
 2)Mudei o Bloco Comercial para funcionar mais como um "Gênero de Comerciais", porque acredito que fique mais intuitivo.
 
+->Arthur Emanuel da Silva (2211100029)
 
 ========================================LÓGICO===============================================
 
@@ -12,6 +24,7 @@ mas isso não é necessário pois eu estou armazenando em cada tipo de material 
 
 2) Armazenei a duração das músicas como int que serão armazenadas em segundos
 
+->Arthur Emanuel da Silva (2211100029)
 
 =======================================CONCEITUAL=============================================
 
