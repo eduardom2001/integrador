@@ -54,6 +54,7 @@ function TelaAdmComercial() {
     const fetchComerciais = async () => {
         try {
             const response = await axios.get('http://localhost:3001/comerciais');
+            console.log('Fetched Data:', response.data);
             setcomercialList(response.data);
         } catch (error) {
             console.error('Error fetching comerciais:', error);
@@ -84,13 +85,21 @@ function TelaAdmComercial() {
         }
 
         try {
-            const formattedDtCad = newComercial.dt_cad ? dayjs(newComercial.dt_cad).format('YYYY-MM-DD') : null;
-            const formattedDtVenc = newComercial.dt_venc ? dayjs(newComercial.dt_venc).format('YYYY-MM-DD') : null;
+            // const formattedDtCad = newComercial.dt_cad ? dayjs(newComercial.dt_cad).format('YYYY-MM-DD') : null;
+            // const formattedDtVenc = newComercial.dt_venc ? dayjs(newComercial.dt_venc).format('YYYY-MM-DD') : null;
+
+            const formattedDtCad = newComercial.dt_cad
+                ? dayjs(newComercial.dt_cad).format('MM-DD-YYYY')
+                : null; // Retorna null se a data não estiver definida
+            const formattedDtVenc = newComercial.dt_venc
+                ? dayjs(newComercial.dt_venc).format('MM-DD-YYYY    ')
+                : null;
+
             const formData = new FormData();
             formData.append("nome", newComercial.nome);
             formData.append("cnpj", newComercial.cnpj_cliente);
-            formData.append("cadastro", newComercial.formattedDtCad);
-            formData.append("vencimento", newComercial.formattedDtVenc);
+            formData.append("cadastro", formattedDtCad);
+            formData.append("vencimento",   formattedDtVenc);
             formData.append("audio", selectedFile);
 
             console.log(newComercial);
@@ -116,6 +125,7 @@ function TelaAdmComercial() {
                 });
     
                 alert("Comercial adicionado com sucesso!");
+                fetchComerciais();
             } else {
                 alert("Erro ao adicionar comercial.");
             }

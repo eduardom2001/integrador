@@ -167,7 +167,7 @@ app.post(
 //CRUD DE COMERCIAIS
 app.get('/comerciais', async (req,res) => {
     try {
-        const comerciais = await db.any("SELECT co.cod,co.cnpj_cliente,cl.nome as nome_cliente,co.nome as nome_comercial,co.dur,co.file_path,co.dt_cad,co.dt_venc FROM comerciais co JOIN clientes cl ON co.cnpj_cliente = cl.cnpj;");
+        const comerciais = await db.any("SELECT co.cod,co.cnpj_cliente,co.nome as nome,co.dur,co.file_path,co.dt_cad,co.dt_venc FROM comerciais co JOIN clientes cl ON co.cnpj_cliente = cl.cnpj;");
         console.log('Retornando todos os comerciais.'); 
         res.json(comerciais).status(200); 
     } catch (error) {
