@@ -17,6 +17,8 @@ import dayjs from 'dayjs';
 
 function TelaAdmComercial() {
 
+    const token = localStorage.getItem('token');
+
     const [selectedFile, setSelectedFile] = React.useState(null);
     const { getRootProps, getInputProps } = useDropzone({
         accept: '.mp3,.wav', // Accept audio files
@@ -53,7 +55,12 @@ function TelaAdmComercial() {
 
     const fetchComerciais = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/comerciais');
+            console.log(token);
+            const response = await axios.get('http://localhost:3001/comerciais', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             console.log('Fetched Data:', response.data);
             setcomercialList(response.data);
         } catch (error) {

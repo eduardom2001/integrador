@@ -13,6 +13,8 @@ import { Button, Container, Box, Autocomplete, TextField, Typography, List, List
 
 function TelaAdmCliente() {
 
+    const token = localStorage.getItem('token');
+
     const [clientList, setClientList] = React.useState([]);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [newClient, setNewClient] = React.useState({
@@ -45,7 +47,11 @@ function TelaAdmCliente() {
 
     const fetchClients = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/clientes');
+            const response = await axios.get('http://localhost:3001/clientes', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             setClientList(response.data);
         } catch (error) {
             console.error('Error fetching clients:', error);
