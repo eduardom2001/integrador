@@ -243,6 +243,9 @@ app.post('/comerciais', uploadComercial.single("audio"),
     passport.authenticate("jwt", { session: false }),  
     authorizeUsername(["comercial"]), async (req, res) => {
     try{
+        console.log('AQUI cadastro');
+        console.log("Received Data:", req.body);
+        console.log("Comercial Code (cod):", req.params.cod);
         const comercialNome = req.body.nome;
         const comercialClienteCnpj = req.body.cnpj;
         const comercialDataCadastro = req.body.cadastro;
@@ -269,6 +272,9 @@ app.put('/comerciais/:cod',
     passport.authenticate("jwt", { session: false }),  
     authorizeUsername(["comercial"]), async (req, res) => {
     try{
+        console.log('AQUI update');
+        console.log("Received Data:", req.body);
+        console.log("Comercial Code (cod):", req.params.cod);
         const comercialCod = req.params.cod;
         const comercialNome = req.body.nome;
         const comercialClienteCnpj = req.body.cnpj;
@@ -282,7 +288,7 @@ app.put('/comerciais/:cod',
         res.sendStatus(200);
     }  catch (error) {
     console.error(error);
-    res.status(400);
+    res.status(400).send("erro atualizando comercial.");
 }
 })
 
@@ -463,6 +469,7 @@ app.put('/musicas/:cod',
     passport.authenticate("jwt", { session: false }),  
     authorizeUsername(["gravadora"]), async (req, res) => {
     try{
+        console.log('AQUI');
         const musicaCod = req.params.cod;
         const musicaNome = req.body.nome;
         const musicaArtista = req.body.artista;

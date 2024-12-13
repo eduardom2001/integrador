@@ -83,17 +83,25 @@ function TelaAdmCliente() {
         console.log('envia cliente');
         event.preventDefault();
         try {
-            const response = await axios.post("http://localhost:3001/clientes", {
-                cnpj: newClient.cnpj,
-                nome: newClient.nome,
-                telef: newClient.telef,
-                email: newClient.email,
-                rua: newClient.rua,
-                num: newClient.num,
-                bairro: newClient.bairro,
-                cidade: newClient.cidade,
-                uf: newClient.uf,
-            });
+            const response = await axios.post("http://localhost:3001/clientes", 
+                {  // The data being sent
+                    cnpj: newClient.cnpj,
+                    nome: newClient.nome,
+                    telef: newClient.telef,
+                    email: newClient.email,
+                    rua: newClient.rua,
+                    num: newClient.num,
+                    bairro: newClient.bairro,
+                    cidade: newClient.cidade,
+                    uf: newClient.uf,
+                },
+                {  // The headers (second argument)
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'  // Ensuring the content type is set to JSON
+                    }
+                }
+            );
     
             if (response.status >= 200 && response.status < 300) {
                 setClientList((prevList) => [...prevList, newClient]);
@@ -136,7 +144,10 @@ function TelaAdmCliente() {
 
     const updateClient = async (updatedClient) => {
         try {
-            const response = await axios.put(`http://localhost:3001/clientes/${updatedClient.cnpj}`, updatedClient);
+            const response = await axios.put(`http://localhost:3001/clientes/${updatedClient.cnpj}`, updatedClient, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+            }});
             if (response.status >= 200 && response.status < 300) {
                 // Update the client list in the UI
                 setClientList((prevList) =>
@@ -162,7 +173,10 @@ function TelaAdmCliente() {
 
     const deleteClient = async (cnpj) => {
         try {
-            const response = await axios.delete(`http://localhost:3001/clientes/${cnpj}`);
+            const response = await axios.delete(`http://localhost:3001/clientes/${cnpj}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+            }});
             if (response.status === 200) {
                 setClientList((prevList) => prevList.filter((client) => client.cnpj !== cnpj));
                 alert('Cliente deletado com sucesso!');

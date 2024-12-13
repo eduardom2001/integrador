@@ -51,28 +51,41 @@ function TelaAdmComercial() {
 
     React.useEffect(() => {
         fetchComerciais();
+        fetchClientCnpjs();
     }, []);
-
+    
     const fetchComerciais = async () => {
         try {
             console.log(token);
             const response = await axios.get('http://localhost:3001/comerciais', {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                }
-            });
-            console.log('Fetched Data:', response.data);
-            setcomercialList(response.data);
+                }});
+                console.log('Fetched Data:', response.data);
+                setcomercialList(response.data);
+            } catch (error) {
+                console.error('Error fetching comerciais:', error);
+            }
+        };
+        
+        const filteredComerciais = comercialList.filter((comercial) =>
+            Object.values(comercial).some((value) =>
+                value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+);
+
+const [clientCnpjs, setClientCnpjs] = React.useState([]);
+const fetchClientCnpjs = async () => {
+        try {
+          const response = await axios.get('http://localhost:3001/clientes', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const cnpjs = response.data.map(client => client.cnpj);
+          setClientCnpjs(cnpjs);
         } catch (error) {
-            console.error('Error fetching comerciais:', error);
+          console.error('Error fetching client CNPJs:', error);
         }
     };
-
-    const filteredComerciais = comercialList.filter((comercial) =>
-        Object.values(comercial).some((value) =>
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    );
 
     const handleInputChange = (key, value) => {
         setnewComercial((prevState) => ({
@@ -117,8 +130,8 @@ function TelaAdmComercial() {
             const response = await axios.post("http://localhost:3001/comerciais", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                },
-            });
+                    'Authorization': `Bearer ${token}`
+            }});
     
             if (response.status >= 200 && response.status < 300) {
                 setcomercialList((prevList) => [...prevList, newComercial]);
@@ -156,14 +169,35 @@ function TelaAdmComercial() {
         setSelectedComercial(null);
     };
 
-    const updateComercial = async (updatedComercial) => {
+    const updateComercial = async (selectedComercial) => {
         try {
-            const response = await axios.put(`http://localhost:3001/clientes/${updatedComercial.cod}`, updatedComercial);
+            const formattedDtCadUpdate = selectedComercial.dt_cad
+                ? dayjs(selectedComercial.dt_cad).format('MM-DD-YYYY')
+                : null; // Retorna null se a data não estiver definida
+            const formattedDtVencUpdate = selectedComercial.dt_venc
+                ? dayjs(selectedComercial.dt_venc).format('MM-DD-YYYY    ')
+                : null;
+
+            const updatedComercialData = {
+                cod: selectedComercial.cod,
+                nome: selectedComercial.nome,
+                cnpj: selectedComercial.cnpj_cliente,
+                cadastro: formattedDtCadUpdate,
+                vencimento: formattedDtVencUpdate
+            };
+                
+            console.log(updatedComercialData);
+
+            const response = await axios.put(`http://localhost:3001/comerciais/${selectedComercial.cod}`, updatedComercialData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+            }});
             if (response.status >= 200 && response.status < 300) {
-                // Update the client list in the UI
+                console.log(response);
                 setcomercialList((prevList) =>
                     prevList.map((comercial) =>
-                        comercial.cod === updatedComercial.cod ? updatedComercial : comercial
+                        comercial.cod === selectedComercial.cod ? selectedComercial : comercial
                     )
                 );
                 alert('Comercial atualizado com sucesso!');
@@ -184,7 +218,10 @@ function TelaAdmComercial() {
 
     const deleteComercial = async (cod) => {
         try {
-            const response = await axios.delete(`http://localhost:3001/comerciais/${cod}`);
+            const response = await axios.delete(`http://localhost:3001/comerciais/${cod}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+            }});
             if (response.status === 200) {
                 setcomercialList((prevList) => prevList.filter((comercial) => comercial.cod !== cod));
                 alert('Comercial deletado com sucesso!');
@@ -241,36 +278,69 @@ function TelaAdmComercial() {
                     {/* POP-UP EDITAR E DELETAR */}
                     <Dialog open={openPopup} onClose={handleClosePopup} fullWidth>
                         <Box sx={{ padding: '16px' }}>
-                        <Typography variant="h6" gutterBottom>Atualizar Comercial</Typography>
-                        {selectedComercial && (
-                            <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {Object.keys(columnWidths).map((key) => (
-                                    <Box key={key} sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Box sx={{ width: '30%', fontWeight: 'bold', textAlign: 'right', paddingRight: '8px' }}>
-                                            {key.toUpperCase()}:
-                                        </Box>
-                                        {key === 'cod' ? (
-                                            <TextField value={selectedComercial[key]} variant="outlined" size="small" InputProps={{ readOnly: true }} fullWidth />
-                                        ) : (
-                                            <TextField
-                                                value={selectedComercial[key]}
-                                                onChange={(e) =>
-                                                    setSelectedComercial((prev) => ({ ...prev, [key]: e.target.value }))
-                                                }
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                            />
-                                        )}
+                            <Typography variant="h6" gutterBottom>Atualizar Comercial</Typography>
+                            {selectedComercial && (
+                                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <TextField
+                                        label="Nome"
+                                        value={selectedComercial.nome}
+                                        onChange={(e) =>
+                                            setSelectedComercial((prev) => ({ ...prev, nome: e.target.value }))
+                                        }
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                    />
+                                    <Autocomplete
+                                        options={clientCnpjs}
+                                        getOptionLabel={(option) => option || ""}
+                                        renderInput={(params) => <TextField {...params} label="CNPJ Cliente" />}
+                                        value={selectedComercial.cnpj_cliente}
+                                        onChange={(event, value) =>
+                                            setSelectedComercial((prev) => ({ ...prev, cnpj_cliente: value }))
+                                        }
+                                        fullWidth
+                                        size="small"
+                                    />
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Data Cadastro"
+                                            value={dayjs(selectedComercial.dt_cad)}
+                                            onChange={(date) =>
+                                                setSelectedComercial((prev) => ({ ...prev, dt_cad: date }))
+                                            }
+                                            renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                                        />
+                                        <DatePicker
+                                            label="Data Vencimento"
+                                            value={dayjs(selectedComercial.dt_venc)}
+                                            onChange={(date) =>
+                                                setSelectedComercial((prev) => ({ ...prev, dt_venc: date }))
+                                            }
+                                            renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                                        />
+                                    </LocalizationProvider>
+                                    <Box display="flex" justifyContent="space-between" mt={2}>
+                                        <Button
+                                            variant="contained"
+                                            sx={{ backgroundColor: 'black' }}
+                                            onClick={() => updateComercial(selectedComercial)}
+                                        >
+                                            Atualizar
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            sx={{ backgroundColor: 'red' }}
+                                            onClick={handleDeletePopupOpen}
+                                        >
+                                            Deletar
+                                        </Button>
+                                        <Button variant="outlined" onClick={handleClosePopup}>
+                                            Cancelar
+                                        </Button>
                                     </Box>
-                                ))}
-                                <Box display="flex" justifyContent="space-between" mt={2}>
-                                    <Button variant="contained" sx={{ backgroundColor: 'black' }} onClick={() => updateComercial(selectedComercial)} >Atualizar</Button>
-                                    <Button variant="contained" sx={{ backgroundColor: 'red' }} onClick={handleDeletePopupOpen}>Deletar</Button>
-                                    <Button variant="outlined" onClick={handleClosePopup}>Cancelar</Button>
                                 </Box>
-                            </Box>
-                        )}
+                            )}
                         </Box>
                     </Dialog>
 
@@ -293,7 +363,7 @@ function TelaAdmComercial() {
                         {/* Name and CNPJ inputs */}
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <TextField fullWidth variant="outlined" label="Nome" size="small" value={newComercial.nome} onChange={(e) => handleInputChange('nome', e.target.value)} />
-                            <TextField fullWidth variant="outlined" label="CNPJ" size="small" value={newComercial.cnpj_cliente} onChange={(e) => handleInputChange('cnpj_cliente', e.target.value)} />
+                            <Autocomplete options={clientCnpjs} getOptionLabel={(option) => option || ""} renderInput={(params) => <TextField {...params} label="CNPJ Cliente" />} value={newComercial.cnpj_cliente} onChange={(event, value) => handleInputChange('cnpj_cliente', value)} fullWidth size="small"/>
                         </Box>
 
                         {/* Date Pickers */}

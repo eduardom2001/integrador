@@ -2,6 +2,9 @@ import * as React from 'react';
 import { Container, Button, Box, Typography, AppBar, Toolbar, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import TelaGravadorMusicas from './TelaGravadorMusicas';
+import TelaGravadorVinhetas from './TelaGravadorVinhetas';
+
 function TelaGravador(props) {
 
     // State to manage the menu anchor
@@ -19,17 +22,28 @@ function TelaGravador(props) {
     const [currentScreen, setCurrentScreen] = React.useState('telaUm');
 
     const handleOptionClick = (option) => {
-        if (option === 'Logout') {
+        if (option === 'First Screen') {
+            setCurrentScreen('telaUm');
+
+        }
+        else if (option === 'Second Screen') {
+            setCurrentScreen('telaDois');
+        }
+        else if (option === 'Logout') {
             console.log('logging out');
             props.logout();
+
+
         }
         console.log(`Selected: ${option}`);
         handleMenuClose(); // Close the menu after selecting an option
     };
 
     return (
-        <div>
-            <AppBar position="absolute" sx={{ top: 0, left: 0, right: 0, backgroundColor: 'black' }}>
+        <div style={{ marginTop: 0, paddingTop: 0 }}>
+            
+            {/* HEADER */}
+            <AppBar position="absolute" sx={{ top: 0, left: 0, right: 0, backgroundColor: 'black'}}>
                 <Toolbar>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, position: 'absolute', left: '10%' }}>
@@ -43,35 +57,18 @@ function TelaGravador(props) {
                     </IconButton>
 
                     <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+                        <MenuItem onClick={() => handleOptionClick('First Screen')}>Musicas</MenuItem>
+                        <MenuItem onClick={() => handleOptionClick('Second Screen')}>Vinhetas</MenuItem>
                         <MenuItem onClick={() => handleOptionClick('Logout')}>Logout</MenuItem>
-                    </Menu>
+                    </Menu> 
                 </Toolbar>
             </AppBar>
-
-            <Container sx={{ border: 1, marginTop: '100px'}}>
-                <Box display="flex" justifyContent="center" alignItems="center">
-                    <h1>Modificar Modelo de Roteiro</h1>
-                </Box>
-
-                <Box display="flex" justifyContent="space-between" marginBottom={'25px'}>
-                    <Box sx={{ border: 1, height: '110px', flexBasis: '69%' }}>
             
-                    </Box>
 
-                    {/* MUDAR TAMANHOS */}
-                    <Box sx={{ height: '110px', flexBasis: '29%' }}>
-                        <Box sx={{border: 1, height: '50px', marginBottom: '10px'}}></Box>
-                        <Box sx={{border: 1, height: '50px'}}></Box>
-                    </Box>
-                </Box>
+            {/* CADASTRO COMERCIAIS */}
+            {currentScreen === 'telaUm' && <TelaGravadorMusicas />}
 
-                <Box display="flex" justifyContent="center" alignItems="center"  sx={{paddingTop: '16px', paddingBottom: '16px'}}>
-                    <Button variant="contained" sx={{backgroundColor: 'black'}}>confirmar mudanças</Button>
-                </Box>
-
-
-            </Container>
-            
+            {currentScreen === 'telaDois' && <TelaGravadorVinhetas />}
             
         </div>
     );
