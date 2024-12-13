@@ -3,7 +3,6 @@ const express = require('express');
 const multer = require('multer');
 const fs = require("fs");
 const getMP3Duration = require("get-mp3-duration");
-const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -13,16 +12,16 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const path = require('path');
 const app = express(); 
+const cors = require("cors");
 app.use(cors());
 app.use(express.json());  
 const db = require('../configs/conexaodb.js')
+
+// abre servidor
 const PORT = 3001
 app.listen(PORT, ( ) => {
     console.log(`Servidor rodando no endereco http://localhost:${PORT}`);
 })
-
-
-//========================================================================================================================================
 
 
 //==============================================================para gerenciar os arquivos e extrair seus dados=========================================================
@@ -49,21 +48,33 @@ const storageComerciais = multer.diskStorage({
 const uploadComercial = multer({ storage: storageComerciais });
 
 
+//calcula a duracao do audio
 const calculateAudioDuration = (filePath) => {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, (err, buffer) => {
             if (err) {
-                reject(err); // Caso não consiga ler o arquivo
+                reject(err); 
             } else {
-                const duration = getMP3Duration(buffer); // Calcula a duração em segundos
-                resolve(duration); // Retorna a duração
+                const duration = [getMP3Duration(buffer)]; 
+                resolve(duration/1000); // retorna em segundos
             }
         });
     });
 };
-//========================================================================================================================================================================
+
+
+//converte tempo segundos para hh:mm:ss
+const secondsToTime = (seconds) => {
+    const date = new Date(null);
+    date.setSeconds(seconds); // specify value for SECONDS here
+    const result = date.toISOString().slice(11, 19);
+    return result;
+};
+
 
 //================================================AUTENTICACAO E AUTORIZACAO CONFIGS======================================================================================
+
+//configura sessao
 app.use(
 	session({
 		secret: 'eu sou a frase que sera usada de base para a criptografia',
@@ -72,13 +83,11 @@ app.use(
 		cookie: { secure: true },
 	}),
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
-
 const saltRounds = 10;
 
-//inserção dos usuarios manual
+//inserção dos usuarios manuais, usuarios pre-setados, senha eh inserida criptografada
 async function cadastrarUsuarios() {
     try {
         await db.none('INSERT INTO login (username, password) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING', ['gravadora', bcrypt.hashSync('gravadora', saltRounds)]);
@@ -86,11 +95,13 @@ async function cadastrarUsuarios() {
         await db.none('INSERT INTO login (username, password) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING', ['operador', bcrypt.hashSync('operador', saltRounds)]);
         console.log('Usuários cadastrados com sucesso!');
     } catch (err) {
-        console.error('Erro ao cadastrar usuários:', err);
+        console.error(err);
     }
 }
 cadastrarUsuarios();
 
+
+//verifica se a senha cadastrada eh igual a recebida dada a criptografia
 passport.use(
 	new LocalStrategy(
 		{
@@ -99,29 +110,29 @@ passport.use(
 		},
 		async (username, password, done) => {
 			try {
-				// busca o usuário no banco de dados
+				
 				const user = await db.oneOrNone(
 					"SELECT username, password FROM login WHERE username = $1;",
 					[username],
 				);
 
-				// se não encontrou, retorna erro
+				
 				if (!user) {
 					return done(null, false, { message: "Usuário incorreto." });
 				}
 
-				// verifica se o hash da senha bate com a senha informada
+				
 				const passwordMatch = await bcrypt.compare(
 					password,
 					user.password,
 				);
 
-				// se senha está ok, retorna o objeto usuário
+				
 				if (passwordMatch) {
 					console.log("Usuário autenticado!");
 					return done(null, user);
 				} else {
-					// senão, retorna um erro
+					
 					return done(null, false, { message: "Senha incorreta." });
 				}
 			} catch (error) {
@@ -130,6 +141,8 @@ passport.use(
 		},
 	),
 );
+
+//serializa e deserialize
 passport.serializeUser(function (user, cb) {
 	process.nextTick(function () {
         return cb(null, user.username);
@@ -142,19 +155,60 @@ passport.deserializeUser(function (user, cb) {
 	});
 });
 
-//========================================================================================================================================================================
+
+//estrategia de verificacao para o token
+passport.use(
+	new JwtStrategy(
+		{
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			secretOrKey: "eu sou a frase que sera usada de base para a criptografia",
+		},
+		async (payload, done) => {
+			try {
+				const user = await db.oneOrNone(
+					"SELECT * FROM login WHERE username = $1;",
+					[payload.username],
+				);
+
+				if (user) {
+					done(null, user);
+				} else {
+					done(null, false);
+				}
+			} catch (error) {
+				done(error, false);
+			}
+		},
+	),
+);
+
+
+//verificar a autorizacao com base no username, para diferentes autorizacoes
+function authorizeUsername(usernames) {
+    return (req, res, next) => {
+        if (usernames.includes(req.user.username)) { //includes para poder autorizar mais de um username
+            next();
+        } else {
+            res.sendStatus(403);
+        }
+    };
+}
+
+
+//=====================================================================ROTAS======================================================================================
 //rota raiz
 app.get('/', (req,res) => {
     res.send('Bem vindo ao Backend da Rádio!!!!!!')
 })
 
+
+//rota de login padrao
 app.post(
 	"/login",
 	passport.authenticate("local", { session: false }),
 	(req, res) => {
 
-		// Cria o token JWT
-		const token = jwt.sign({ username: req.body.username }, "your-secret-key", {
+		const token = jwt.sign({ username: req.body.username }, "eu sou a frase que sera usada de base para a criptografia", {
 			expiresIn: "1h",
 		});
 
@@ -162,34 +216,41 @@ app.post(
 	},
 );
 
-//ROTAS PARA SETOR COMERCIAL
 
-//CRUD DE COMERCIAIS
-app.get('/comerciais', async (req,res) => {
+//================================================================================================CRUD DE COMERCIAIS==========================================================================================================
+
+//read comercial
+app.get('/comerciais', 
+    passport.authenticate("jwt", { session: false }),
+    authorizeUsername(["comercial", "gravadora","operador"]), async (req,res) => {
     try {
-        const comerciais = await db.any("SELECT co.cod,co.cnpj_cliente,co.nome as nome,co.dur,co.file_path,co.dt_cad,co.dt_venc FROM comerciais co JOIN clientes cl ON co.cnpj_cliente = cl.cnpj;");
+        const comerciais = await db.any("SELECT co.cod,co.cnpj_cliente,cl.nome as nome_cliente,co.nome as nome_comercial,co.dur,co.file_path,co.dt_cad,co.dt_venc FROM comerciais co JOIN clientes cl ON co.cnpj_cliente = cl.cnpj;");
         console.log('Retornando todos os comerciais.'); 
+
+        //converte em hh:mm:ss para cada objeto do json
+        for (let i = 0; i < comerciais.length; i++) {
+            comerciais[i].dur = secondsToTime(comerciais[i].dur);
+        }
         res.json(comerciais).status(200); 
     } catch (error) {
         console.log(error); 
-        res.sendStatus(400); 
+        res.sendStatus(404); 
     }
 })
  
-app.post('/comerciais',uploadComercial.single("audio"), async (req,res) => {
+//create comercial
+app.post('/comerciais', uploadComercial.single("audio"),  
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try{
         const comercialNome = req.body.nome;
         const comercialClienteCnpj = req.body.cnpj;
         const comercialDataCadastro = req.body.cadastro;
         const comercialDataVencimento = req.body.vencimento;
         const comercialFilePath = path.join(__dirname, "uploads/comerciais", req.file.filename);
-        
-        console.log("Data received:", {
-            comercialDataCadastro,
-            comercialDataVencimento,
-        });
-        
         const duration = await calculateAudioDuration(comercialFilePath);
+
+
         
         await db.none(
             "INSERT INTO comerciais (nome,cnpj_cliente,file_path,dur,dt_cad,dt_venc) VALUES ($1,$2,$3,$4,$5,$6) ",
@@ -198,15 +259,15 @@ app.post('/comerciais',uploadComercial.single("audio"), async (req,res) => {
     
         res.sendStatus(201);
     }  catch (error) {
-        console.log('AQUI');
-        console.log(req.body);
-        console.log(req.file);
-        console.error("Erro ao salvar música:", error);
-        res.status(500).json({ error: "Erro ao salvar música" });
-    }
+    console.log(error);
+    res.sendStatus(400);
+}
 })
 
-app.put('/comerciais/:cod', async (req,res) => {
+//update comercial
+app.put('/comerciais/:cod',  
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try{
         const comercialCod = req.params.cod;
         const comercialNome = req.body.nome;
@@ -218,14 +279,17 @@ app.put('/comerciais/:cod', async (req,res) => {
             [comercialNome,comercialClienteCnpj,comercialDataCadastro,comercialDataVencimento,comercialCod]
         );
     
-        res.sendStatus(201);
+        res.sendStatus(200);
     }  catch (error) {
-    console.error("Erro ao salvar música:", error);
-    res.status(500).json({ error: "Erro ao salvar música" });
+    console.error(error);
+    res.status(400);
 }
 })
 
-app.delete('/comerciais/:cod', async (req,res) => {
+//delete comercial
+app.delete('/comerciais/:cod',
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try{
         const comercialCod= req.params.cod;
         const comercial_caminho = await db.one("SELECT file_path FROM comerciais WHERE cod = $1", [comercialCod]);
@@ -245,13 +309,14 @@ app.delete('/comerciais/:cod', async (req,res) => {
     }
 })
 
-//CRUD DE CLIENTES
+//================================================================================================CRUD DE CLIENTES==========================================================================================================
 
-//lista todos os dados de todos os clientes
-app.get('/clientes', async (req,res) => {
+//read cliente
+app.get('/clientes',
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try {
         const clientes = await db.any("SELECT * FROM clientes ORDER BY nome;");
-        console.log('Retornando todos os clientes.'); 
         res.json(clientes).status(200); 
     } catch (error) {
         console.log(error); 
@@ -259,22 +324,25 @@ app.get('/clientes', async (req,res) => {
     }
 })
  
-//listar clientes com nome "similar" ao nome recebido
-app.get('/cliente-similares', async (req,res) => {
+//read clientes com nome "similar" ao nome recebido
+app.get('/cliente-similares', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try {
         const clienteNome = req.query.nome;
         const cliente = await db.any("SELECT * FROM clientes WHERE nome ILIKE $1",
     [`%${clienteNome}%`]);
-        console.log('Retornando todos os clientes.'); 
         res.json(cliente).status(200); 
     } catch (error) {
         console.log(error); 
-        res.sendStatus(400); 
+        res.sendStatus(404); 
     }
 })
 
-//registra cliente novo
-app.post('/clientes', async (req,res) => {
+//create cliente
+app.post('/clientes', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try {
         //pega os dados a serem inseridos 
         const clienteCpnj = req.body.cnpj; 
@@ -292,14 +360,17 @@ app.post('/clientes', async (req,res) => {
             "INSERT INTO clientes (cnpj,nome,telef,email,rua,num,bairro,cidade,uf) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
             [clienteCpnj, clienteNome, clienteTelef, clienteEmail, clienteRua, clienteNum, clienteBairro, clienteCidade, clienteUf]
         );
-        res.sendStatus(200); // Retorna status 200 em caso de sucesso
+        res.sendStatus(201); // Retorna status 200 em caso de sucesso
     } catch (error) {
         console.log(error); // Log do erro para depuração
         res.sendStatus(400); // Retorna status 400 em caso de erro
     }
 })
 
-app.put('/clientes/:cnpj', async (req,res) => {
+//update cliente
+app.put('/clientes/:cnpj',
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try {
         const clienteCpnj = req.params.cnpj; 
         const clienteNome = req.body.nome;
@@ -314,7 +385,6 @@ app.put('/clientes/:cnpj', async (req,res) => {
             "UPDATE clientes SET nome = $1,telef = $2,email = $3,rua = $4,num = $5,bairro = $6,cidade = $7,uf = $8 WHERE cnpj=$9",
             [clienteNome, clienteTelef, clienteEmail, clienteRua, clienteNum, clienteBairro, clienteCidade, clienteUf, clienteCpnj]
         );
-        console.log('Atualizações feitas...'); 
         res.sendStatus(200); 
     } catch (error) {
         console.log(error); 
@@ -322,7 +392,10 @@ app.put('/clientes/:cnpj', async (req,res) => {
     }
 })
 
-app.delete('/clientes/:cnpj', async (req,res) => {
+//delete cliente
+app.delete('/clientes/:cnpj', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial"]), async (req, res) => {
     try {
         const clienteCnpj = req.params.cnpj; 
         await db.none(
@@ -337,23 +410,32 @@ app.delete('/clientes/:cnpj', async (req,res) => {
 })
 
 
-//===============================ROTAS PARA GRAVADORA===============================
 
 
-//CRUD DE MUSICAS
-app.get('/musicas', async (req,res) => {
+
+//================================================================================================CRUD DE MUSICAS==========================================================================================================
+
+//read musicas
+app.get('/musicas', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora","operador"]), async (req, res) => {
     try {
         const musicas = await db.any("SELECT m.cod,m.artist,m.nome as nome_musica,m.cod_gen,g.nome as nome_genero,m.dur,m.file_path FROM musicas m JOIN generos g ON m.cod_gen = g.cod;");
-        console.log('Retornando todas as musicas.'); 
+        for (let i = 0; i < musicas.length; i++) {
+            musicas[i].dur = secondsToTime(musicas[i].dur);
+        }
         res.json(musicas).status(200); 
     } catch (error) {
         console.log(error); 
-        res.sendStatus(400); 
+        res.sendStatus(404); 
     }
 })
 
 
-app.post("/musica", uploadMusica.single("audio"), async (req, res) => {
+//create musica
+app.post("/musica", uploadMusica.single("audio"), 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         
         const musicaNome = req.body.nome;
@@ -371,11 +453,15 @@ app.post("/musica", uploadMusica.single("audio"), async (req, res) => {
         
         res.sendStatus(201);
     } catch (error) {
-        console.error("Erro ao salvar música:", error);
-        res.status(500).json({ error: "Erro ao salvar música" });
+        console.log(error);
+        res.status(400);
     }
 });
-app.put('/musicas/:cod', async (req,res) => {
+
+//update musica
+app.put('/musicas/:cod',
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try{
         const musicaCod = req.params.cod;
         const musicaNome = req.body.nome;
@@ -385,14 +471,17 @@ app.put('/musicas/:cod', async (req,res) => {
             "UPDATE musicas SET nome = $1, artist = $2, cod_gen = $3 WHERE cod = $4",
             [musicaNome, musicaArtista,musicaCod_Gen,musicaCod ]
         )
-        res.sendStatus(201);
+        res.sendStatus(200);
     }catch (error) {
         console.log(error)
         res.sendStatus(400)
     }
 })
 
-app.delete('/musicas/:cod', async (req,res) => {
+//delete musica
+app.delete('/musicas/:cod', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try{
         const musicaCod = req.params.cod;
         const musica_caminho = await db.one("SELECT file_path FROM musicas WHERE cod = $1", [musicaCod]);
@@ -412,20 +501,28 @@ app.delete('/musicas/:cod', async (req,res) => {
     }
 })
 
-//CRUD DE VINHETAS
+//================================================================================================CRUD DE VINHETAS==========================================================================================================
 
-app.get('/vinhetas', async (req,res) => {
+//read vinheta
+app.get('/vinhetas', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora","operador"]), async (req, res) => {
     try {
         const vinhetas = await db.any("SELECT v.cod,v.nome as nome_vinheta,v.cod_gen,g.nome as nome_genero,v.dur,v.file_path FROM vinhetas v JOIN generos g ON v.cod_gen = g.cod;");
-        console.log('Retornando todas as vinhetas.'); 
+        for (let i = 0; i < vinhetas.length; i++) {
+            vinhetas[i].dur = secondsToTime(vinhetas[i].dur);
+        }
         res.json(vinhetas).status(200); 
     } catch (error) {
         console.log(error); 
-        res.sendStatus(400); 
+        res.sendStatus(404); 
     }
 })
 
-app.post('/vinhetas', uploadVinheta.single("audio"), async (req,res) => {
+//create vinheta
+app.post('/vinhetas', uploadVinheta.single("audio"), 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         
         const vinhetaNome = req.body.nome;
@@ -442,13 +539,16 @@ app.post('/vinhetas', uploadVinheta.single("audio"), async (req,res) => {
         
         res.sendStatus(201);
     } catch (error) {
-        console.error("Erro ao salvar música:", error);
-        res.status(500).json({ error: "Erro ao salvar música" });
+        console.log(error);
+        res.status(400);
     }
     
 })
 
-app.put('/vinhetas/:cod', async (req,res) => {
+//update vinheta
+app.put('/vinhetas/:cod', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try{
         const vinhetaCod = req.params.cod;
         const vinhetaNome = req.body.nome;
@@ -457,14 +557,17 @@ app.put('/vinhetas/:cod', async (req,res) => {
             "UPDATE vinhetas SET nome = $1, cod_gen = $2 WHERE cod = $3",
             [vinhetaNome, vinhetaCod_Gen,vinhetaCod ]
         )
-        res.sendStatus(201);
+        res.sendStatus(200);
     }catch (error) {
         console.log(error)
         res.sendStatus(400)
     }
 })
 
-app.delete('/vinhetas/:cod', async (req,res) => {
+//delete vinheta
+app.delete('/vinhetas/:cod', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try{
         const vinhetaCod = req.params.cod;
         const vinheta_caminho = await db.one("SELECT file_path FROM vinhetas WHERE cod = $1", [vinhetaCod]);
@@ -484,19 +587,25 @@ app.delete('/vinhetas/:cod', async (req,res) => {
     }
 })
 
-//GENEROS MUSICAIS E TIPOS DE VINHETAS
-app.get('/generos', async(req,res) => {
+//================================================================================================CRUD DE GENEROS==========================================================================================================
+
+//read generos
+app.get('/generos', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         const generos = await db.any("SELECT * FROM generos ORDER BY cod;");
-        console.log('Retornando todos os generos.'); 
         res.json(generos).status(200); 
     } catch (error) {
         console.log(error); 
-        res.sendStatus(400); 
+        res.sendStatus(404); 
     }
 })
 
-app.post('/generos', async (req,res) => {
+//create genero
+app.post('/generos', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         //pega os dados a serem inseridos 
         const generoNome = req.body.nome; 
@@ -506,14 +615,17 @@ app.post('/generos', async (req,res) => {
             "INSERT INTO generos (nome) values ($1);",
             [generoNome]
         );
-        res.sendStatus(200); // Retorna status 200 em caso de sucesso
+        res.sendStatus(201); // Retorna status 200 em caso de sucesso
     } catch (error) {
         console.log(error); // Log do erro para depuração
         res.sendStatus(400); // Retorna status 400 em caso de erro
     }
 })
 
-app.put('/generos/:cod', async (req,res) => {
+//update genero
+app.put('/generos/:cod', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         const generoCod = req.params.cod;
         const generoNome = req.body.nome;
@@ -521,7 +633,6 @@ app.put('/generos/:cod', async (req,res) => {
             "UPDATE generos SET nome = $1 WHERE cod = $2 ",
             [generoNome,generoCod]
         );
-        console.log('Atualizações feitas...'); 
         res.sendStatus(200); 
     } catch (error) {
         console.log(error); 
@@ -529,7 +640,10 @@ app.put('/generos/:cod', async (req,res) => {
     }
 })
 
-app.delete('/generos/:cod', async (req,res) => {
+//delete genero
+app.delete('/generos/:cod', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["gravadora"]), async (req, res) => {
     try {
         const generoCod = req.params.cod; 
         await db.none(
@@ -543,9 +657,13 @@ app.delete('/generos/:cod', async (req,res) => {
     }
 })
 
-//PLAYLIST
 
-app.get('/items-playlist', async (req, res) => {
+//================================================================================================ PLAYLIST ==========================================================================================================
+
+//read items da playlist
+app.get('/items-playlist', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial","gravadora","operador"]), async (req, res) => {
     try {
         const query = `
             SELECT 
@@ -582,11 +700,15 @@ app.get('/items-playlist', async (req, res) => {
         res.status(200).json(items);
     } catch (error) {
         console.error(error);
-        res.sendStatus(500);
+        res.sendStatus(404);
     }
 });
 
-app.post('/items-playlist', async (req, res) => {
+
+//post items na playlist
+app.post('/items-playlist', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial","gravadora","operador"]), async (req, res) => {
     try {
         const itemPlaylistCod = req.body.cod;
         const itemPlaylistTipo = req.body.tipo;
@@ -606,14 +728,17 @@ app.post('/items-playlist', async (req, res) => {
             [posicao, itemPlaylistCod, itemPlaylistTipo]
         );
 
-        res.sendStatus(200);
+        res.sendStatus(201);
     } catch (error) {
         console.error(error);
-        res.sendStatus(500);
+        res.sendStatus(400);
     }
 });
 
-app.delete('/items-playlist/:id', async (req, res) => {
+//delete item na playlist atualizando as posicoes
+app.delete('/items-playlist/:id', 
+    passport.authenticate("jwt", { session: false }),  
+    authorizeUsername(["comercial","gravadora","operador"]), async (req, res) => {
     try {
         const itemPlaylistId = req.params.id;
 
@@ -634,8 +759,4 @@ app.delete('/items-playlist/:id', async (req, res) => {
 });
 
 
-
-//por questão de boas praticas é ideal voce separar as rotas do server em si, por isso
-//deve-se separar o listen em um arquivo server na pasta root, esse export possibilita isso
-//mas antes, para ativar os exports, deve-se inserir "type": "module" no package.json, olhe la
 module.exports = app;
